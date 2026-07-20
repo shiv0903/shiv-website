@@ -11,7 +11,7 @@ export default function App() {
 
       <main className="main-content">
         <div className="apps-grid">
-          <a href="https://calorie-count-production-dc17.up.railway.app" className="app-card" target="_blank" rel="noopener noreferrer">
+          <a href="https://disciplined-flow-production-608a.up.railway.app" className="app-card" target="_blank" rel="noopener noreferrer">
             <div className="card-icon">🍽️</div>
             <h2>Calorie Count</h2>
             <p>Track daily calories and monitor weight goals</p>
