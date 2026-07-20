@@ -1,38 +1,91 @@
+import React, { useState, useEffect } from 'react';
 import './App.css';
+import LoginPage from './pages/LoginPage';
+import ProfileSetupPage from './pages/ProfileSetupPage';
+import DailyLogPage from './pages/DailyLogPage';
 
 export default function App() {
-  return (
-    <div className="container">
-      <header className="header">
-        <h1>🚀 My Apps</h1>
-        <p>Explore all my projects</p>
-      </header>
+  const [page, setPage] = useState('login');
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-      <div className="apps-grid">
-        {/* Health App Card */}
-        <a href="https://health-app-production-xxxx.up.railway.app" className="app-card">
-          <div className="app-icon">🏥</div>
-          <h2>Health App</h2>
-          <p>Track your daily calories and weight goals with an AI-powered food recognizer.</p>
-          <span className="badge">Live</span>
-        </a>
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetchProfile(token);
+    } else {
+      setLoading(false);
+    }
+  }, []);
 
-        {/* Placeholder for Future Apps */}
-        <div className="app-card placeholder">
-          <div className="app-icon">📱</div>
-          <h2>Coming Soon</h2>
-          <p>More apps coming soon...</p>
-          <span className="badge">WIP</span>
-        </div>
+  const fetchProfile = async (token) => {
+    try {
+      const response = await fetch('/api/profile', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUser({ token });
+        setProfile(data);
+        setPage('daily-log');
+      } else {
+        localStorage.removeItem('token');
+        setPage('login');
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      setPage('login');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLoginSuccess = (token) => {
+    localStorage.setItem('token', token);
+    setUser({ token });
+    setPage('profile-setup');
+  };
+
+  const handleProfileSetup = (profileData) => {
+    setProfile(profileData);
+    setPage('daily-log');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    setProfile(null);
+    setPage('login');
+  };
+
+  if (loading) {
+    return (
+      <div className="container loading-container">
+        <div className="loader"></div>
+        <p>Loading...</p>
       </div>
+    );
+  }
 
-      <footer className="footer">
-        <p>Made with ❤️ by shiv0903</p>
-        <p>
-          <a href="https://github.com/shiv0903">GitHub</a> | 
-          <a href="https://twitter.com">Twitter</a>
-        </p>
-      </footer>
+  return (
+    <div className="app">
+      {page === 'login' && (
+        <LoginPage onLoginSuccess={handleLoginSuccess} />
+      )}
+      
+      {page === 'profile-setup' && (
+        <ProfileSetupPage onProfileSetup={handleProfileSetup} />
+      )}
+      
+      {page === 'daily-log' && profile && (
+        <DailyLogPage 
+          profile={profile} 
+          user={user}
+          onLogout={handleLogout}
+        />
+      )}
     </div>
   );
 }
