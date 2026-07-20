@@ -1,91 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './App.css';
-import LoginPage from './pages/LoginPage';
-import ProfileSetupPage from './pages/ProfileSetupPage';
-import DailyLogPage from './pages/DailyLogPage';
 
 export default function App() {
-  const [page, setPage] = useState('login');
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem('token');
-    if (token) {
-      fetchProfile(token);
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
-  const fetchProfile = async (token) => {
-    try {
-      const response = await fetch('/api/profile', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUser({ token });
-        setProfile(data);
-        setPage('daily-log');
-      } else {
-        localStorage.removeItem('token');
-        setPage('login');
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      setPage('login');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLoginSuccess = (token) => {
-    localStorage.setItem('token', token);
-    setUser({ token });
-    setPage('profile-setup');
-  };
-
-  const handleProfileSetup = (profileData) => {
-    setProfile(profileData);
-    setPage('daily-log');
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    setProfile(null);
-    setPage('login');
-  };
-
-  if (loading) {
-    return (
-      <div className="container loading-container">
-        <div className="loader"></div>
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="app">
-      {page === 'login' && (
-        <LoginPage onLoginSuccess={handleLoginSuccess} />
-      )}
-      
-      {page === 'profile-setup' && (
-        <ProfileSetupPage onProfileSetup={handleProfileSetup} />
-      )}
-      
-      {page === 'daily-log' && profile && (
-        <DailyLogPage 
-          profile={profile} 
-          user={user}
-          onLogout={handleLogout}
-        />
-      )}
-    </div>
-  );
-}
+      <header className="header">
+        <div className="header-content">
+          <h1>🚀 My Apps</h1>
+          <p className="tagline">Portfolio of Projects</p>
+        </div>
+      </header>
+
+      <main className="main-content">
+        <div className="apps-grid">
+          {/* Calorie Count App Card */}
+          <a 
+            href="https://calorie-count-production-dc17.up.railway.app" 
+            className="app-card"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className="card-icon">🍽️</div>
+            <h2>Calorie Count</h2>
+            <p>Track your daily calories, log meals, and monitor your weight goals with precision.</p>
+            <div className="card-footer">
+              <span className="tech-stack">FastAPI • React • SQLite</span>
+              <span className="arrow">→</span>
+            </div>
+          </a>
+
+          {/* Coming Soon Card */}
+          <div className="app-card coming-soon">
+            <div className="card-icon">🔜</div
